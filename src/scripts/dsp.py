@@ -17,23 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this application;  If not, see <http://www.gnu.org/licenses/>.
 """
 
-class DSPScript(object):
-    """ A script to operate over signals.
-    """
-    def __init__(self, name, script, doc=""):
-        self.name = name
-        self.script = script
-        self.doc = doc
-
-    def __call__(self, *args, **kwargs):
-        return self.script(*args, **kwargs)
-
-    def __repr__(self):
-        return "<DSPScript: %s>" % self.name
-
-    def __str__(self):
-        return self.name
-
+from script import DSPScript
 
 def script(script_name):
     """ Decorator to export a funtion as a plugin
@@ -44,4 +28,3 @@ def script(script_name):
         return DSPScript(script_name, script, script.__doc__)
 
     return script_decorator
-
