@@ -17,7 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with this application;  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from script import DSPScript
+from script import Script
 
 def script(script_name):
     """ Decorator to export a funtion as a plugin
@@ -25,6 +25,6 @@ def script(script_name):
     """
 
     def script_decorator(script):
-        return DSPScript(script_name, script, script.__doc__)
+        return Script(script_name, script, script.__doc__)
 
     return script_decorator
