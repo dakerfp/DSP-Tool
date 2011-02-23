@@ -18,24 +18,17 @@ along with this application;  If not, see <http://www.gnu.org/licenses/>.
 """
 import dsp
 
-@dsp.script("Max Value")
-def max_value(signal):
-    """ Gets the max amplitude of a signal.
+@dsp.script("Fast Fourier Transform")
+def fft_value(signal):
+    """ Gets the fft of a signal.
     """
-    import numpy as np
-    return np.max(signal)
+    import scipy.signal as sig
+    return sig.fft(signal)
 
-@dsp.script("Min Value")
-def min_value(signal):
-    """ Gets the min amplitude of a signal.
+@dsp.script("Inverse Fast Fourier Transform")
+def ifft_value(signal):
+    """ Gets the inverse fft of a signal.
     """
-    import numpy as np
-    return np.min(signal)
-
-@dsp.script("Average Value")
-def avg_value(signal):
-    """ Gets the average amplitude of a signal.
-    """
-    import numpy as np
-    return np.average(signal)
+    import scipy.signal as sig
+    return sig.ifft(signal)
 
