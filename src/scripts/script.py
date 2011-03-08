@@ -29,6 +29,9 @@ class Script(object):
         self.parent = parent
         self.script = script
 
+    def toDict(self):
+        return {'name': self.name, 'doc': self.doc}
+
     def __call__(self, *args, **kwargs):
         return self.script(*args, **kwargs)
 
@@ -58,7 +61,7 @@ class Plugin(object):
         """ Gets a module path and returns all the scripts on it.
         """
         module = __import__(self.name)
-        members=[module.__getattribute__(member) for member in dir(module)]
+        members = [getattr(module,member) for member in dir(module)]
         scripts = [m for m in members if isinstance(m, Script)]
         row = 0
         for script in scripts:
@@ -69,6 +72,10 @@ class Plugin(object):
         # self.doc = module.__doc__ TODO: set this
 
         return scripts
+
+    def toDict(self):
+        scripts = [scr.toDict() for scr in self.scripts]
+        return {'name': self.name, 'doc': self.doc, 'scripts': scripts}
 
     def __repr__(self):
         return "<DSP-Plugin %s: %s>" % (self.name, repr(self.scripts))
@@ -113,6 +120,9 @@ class Module(object):
         sys.path.pop()
 
         return plugins
+
+    def toDict(self):
+        return [mod.toDict() for mod in self.modules]
 
     def __repr__(self):
         return "<DSP-Module %s: %s>" % (self.name, repr(self.modules))
