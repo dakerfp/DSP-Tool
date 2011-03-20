@@ -17,20 +17,23 @@ You should have received a copy of the GNU Lesser General Public License
 along with this application;  If not, see <http://www.gnu.org/licenses/>.
 """
 import os
+import sys
 import pickle
 import numpy as np
 import scipy as sp
-from .util import Project
+from util.Project import Project
+from SideBar import SideBar
+from PropertyBar import PropertyBar
 import scipy.signal as sig
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-from .util.addSignal import addSignal
-from .util.openProject import openProject
-from .util.createProject import createProject
+from util.addSignal import addSignal
+from util.openProject import openProject
+from util.createProject import createProject
 from PySide.QtCore import Signal, Slot
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from PySide.QtGui import QDialog, QLineEdit, QPushButton, QTextEdit, QErrorMessage, QTableWidget, QTableWidget, QMessageBox
-from PySide.QtGui import QMainWindow, QVBoxLayout, QMenu, QMenuBar, QFileDialog, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QPixmap, QScrollArea
+from PySide.QtGui import QDialog, QErrorMessage, QTableWidget, QMessageBox
+from PySide.QtGui import QMainWindow, QVBoxLayout, QMenu, QMenuBar, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QScrollArea
 
 
 class DSPToolFileMenu(QMenu):
@@ -39,10 +42,11 @@ class DSPToolFileMenu(QMenu):
     def __init__(self, parent=None):
         QMenu.__init__(self, "&Files")
         self.parent = parent
+        
+        self.setWindowTitle("DSP-Tool")
 
         newProjectAction = self.addAction(self.trUtf8("&New Project"))
-        newProjectAction.triggered.connect(self.createNewProject)
-        
+        newProjectAction.triggered.connect(self.createNewProject)        
         
         openProjectAction = self.addAction(self.trUtf8("&Open Project"))
         openProjectAction.triggered.connect(self.openProject)
@@ -106,43 +110,79 @@ class DSPToolSignalsMenu(QMenu):
 class DSPToolMainWindow(QMainWindow):
     """
     """
-
     def __init__(self):
         QMainWindow.__init__(self)
-        
         self.project = None
         
+        self.initializeUI()
+        self.platform = sys.platform
+		
+    def refreshTable(self):
+        '''
+        '''        
+        for i in range(0, len(self.project.signalList)):
+            self.table.setRowCount(self.table.rowCount()+1)
+            for j in range (0, len(self.project.signalList[i])):                        
+                if self.table.columnCount() < j+1: self.table.setColumnCount(self.table.columnCount()+1)
+                label = self.project.signalList[i][j].getImage()
+                self.table.setCellWidget(i,j,label)
+                self.table.resizeColumnsToContents()
+                self.table.resizeRowsToContents()
+        self.setLabels()
+    
+    def setLabels(self):
+        '''
+        '''
+        self.table.setHorizontalHeaderLabels(self.project.horizontalLabels)
+        self.table.setVerticalHeaderLabels(self.project.verticalLabels)
+    
+    def oneClickedEvent(self):
+        index =  self.table.selectedIndexes()[0]
+        i = index.row()
+        j = index.column()
+        self.sideBar.setProperties(self.project.signalList[i][j])
+    
+    def refreshProperties(self):
+        self.propertyBar.setProperties()
+		
+    def initializeUI(self):
+    
+        self.mainWidget = QWidget()
+        
+        #Size
+        self.resize(1024,768)       
+        
+        #MenuBar
         menuBar = QMenuBar()
-
         self.fileMenu = DSPToolFileMenu(self)
         menuBar.addMenu(self.fileMenu)
-
         self.signalMenu = DSPToolSignalsMenu(self)
         menuBar.addMenu(self.signalMenu)
-
         self.setMenuBar(menuBar)
+                
+        #Table Widget
+        self.table = QTableWidget()
+        self.table.setFixedWidth(824)        
+        scrollTable = QScrollArea()
+        scrollTable.setWidget(self.table)
+        scrollTable.setWidgetResizable(True)
         
-        self.mainWidget=QTableWidget()
-        self.mainWidget.setRowCount(0)
-        self.mainWidget.setColumnCount(0)
-              
-        scrollWidget = QScrollArea()
-        scrollWidget.setWidget(self.mainWidget)
-        scrollWidget.setWidgetResizable(True)
+        #Side and Property Bar
+        self.sideBar = SideBar()
+        self.propertyBar = PropertyBar(self)
         
-        self.setCentralWidget(scrollWidget)
+        #Layouts
+        hLayout = QHBoxLayout()
+        hLayout.addWidget(self.table)               
+        hLayout.addWidget(self.sideBar)        
+        hWidget = QWidget()
+        hWidget.setLayout(hLayout)               
+        vLayout = QVBoxLayout()
+        vLayout.addWidget(hWidget)       
+        vLayout.addWidget(self.propertyBar)
+        self.mainWidget.setLayout(vLayout)
+        self.setCentralWidget(self.mainWidget)
         
-    def refreshTable(self):
-        i = 0
-        for x in self.project.signalList:
-            j=0
-            self.mainWidget.setRowCount(self.mainWidget.rowCount()+1)
-            for y in x:
-                print "entrou"                
-                if self.mainWidget.columnCount() < j+1: self.mainWidget.setColumnCount(self.mainWidget.columnCount()+1)
-                label = y.getImage()
-                self.mainWidget.setCellWidget(i,j,label)
-                self.mainWidget.resizeColumnsToContents()
-                self.mainWidget.resizeRowsToContents()
-                j+=1            
-            i+=1    
+        #Signals
+        self.table.cellClicked.connect(self.oneClickedEvent)  
+    

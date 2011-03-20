@@ -38,7 +38,7 @@ class ScriptModel(QAbstractItemModel):
             return len(self.rootItem)
 
     def columnCount(self, parent):
-        return 2
+        return 3
 
     def data(self, index, role):
         if not index.isValid() or role != Qt.DisplayRole:
@@ -48,10 +48,14 @@ class ScriptModel(QAbstractItemModel):
 
         item = index.internalPointer()
 
+        print item, index
+
         if col == 0:
             return item.name
         elif col == 1:
             return item.doc
+        elif col == 2:
+            return len(item)
         else:
             return None
 
@@ -82,6 +86,8 @@ class ScriptModel(QAbstractItemModel):
                 return "Module"
             elif section == 1:
                 return "Summary"
+            elif section == 2:
+                return "len"
 
 
     def parent(self, index):
@@ -103,7 +109,7 @@ if __name__ == '__main__':
 
     app = QtGui.QApplication(sys.argv)
 
-    rootpath = "/home/dakerfp/workspace/dsp-tool/src/scripts/plugins"
+    rootpath = "/home/dakerfp/work/dsp-tool/src/scripts/plugins"
     model = ScriptModel(rootpath)
     print repr(model.rootItem)
     model.row = 0

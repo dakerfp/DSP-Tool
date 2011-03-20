@@ -27,7 +27,7 @@ if __name__ == '__main__':
     # TODO: QApplication.translate()
 
     window = DSPToolMainWindow()
-    window.resize(800,600)
+
     window.show()
 
     sys.exit(app.exec_())
