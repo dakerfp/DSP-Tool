@@ -5,11 +5,15 @@ Item {
     width: 800
     height: 600
 
+    property alias modName: description.name
+    property alias modDoc: description.doc
     signal scriptSelected(int plugin, int script)
 
     Component {
         id: selectedRow
         Rectangle {
+            width: root.width / 3
+            height: 30
             color: "gray"
             opacity: 0.4
         }
@@ -34,6 +38,8 @@ Item {
                     onClicked: {
                         moduleList.currentIndex = index;
                         scriptList.model = modelData.scripts;
+                        root.modName = modelData.name
+                        root.modDoc = modelData.doc
                     }
                 }
             }
@@ -57,6 +63,8 @@ Item {
                     anchors.fill: parent
                     onClicked: {
                         scriptList.currentIndex = index;
+                        root.modName = modelData.name
+                        root.modDoc = modelData.doc
                     }
                 }
             }
@@ -64,12 +72,19 @@ Item {
     }
 
     Text {
+        id: description
+
+        property string name
+        property string doc
+
+        wrapMode: Text.WordWrap
         anchors {
             top: parent.top
             bottom: selectButton.top
             right: parent.right
             left: scriptList.right
         }
+        text: "<h1>" + name + "</h1>\n" + doc
     }
 
     Rectangle {
@@ -86,6 +101,11 @@ Item {
             anchors.fill: parent
             onClicked: root.scriptSelected(
                 moduleList.currentIndex, scriptList.currentIndex);
+        }
+        Text {
+            anchors.centerIn: parent
+            text: "Ok"
+            font.pixelSize: 24
         }
     }
     onScriptSelected: {
