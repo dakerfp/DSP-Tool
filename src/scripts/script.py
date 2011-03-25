@@ -23,11 +23,12 @@ import os
 class Script(object):
     """ A script to operate over signals.
     """
-    def __init__(self, name, script, doc="", parent=None):
+    def __init__(self, name, script, doc="", returns=None, parent=None):
         self.name = name
         self.doc = doc
         self.parent = parent
         self.script = script
+        self.returns = returns
 
     def toDict(self):
         return {'name': self.name, 'doc': self.doc}

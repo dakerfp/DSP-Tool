@@ -19,12 +19,12 @@ along with this application;  If not, see <http://www.gnu.org/licenses/>.
 
 from script import Script
 
-def script(script_name):
+def script(script_name, returns='signal'):
     """ Decorator to export a funtion as a plugin
     to the DSP-Tool.
     """
 
     def script_decorator(script):
-        return Script(script_name, script, script.__doc__)
+        return Script(script_name, script, script.__doc__, returns='signal')
 
     return script_decorator
